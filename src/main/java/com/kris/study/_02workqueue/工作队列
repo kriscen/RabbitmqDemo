@@ -1,0 +1,33 @@
+模型
+    一个生产者多个消费者
+
+生产者
+    轮询(round-robin)
+        任务按次序分发
+    公平分发(fair dispatch)
+        注意：需要关闭自动应答ack，改为手动。
+
+
+消息应答
+    //应答ack，true：自动确认，false：手动确认
+    boolean aotuAck = false;
+    channel.basicConsume(QUEUE_NAME,aotuAck,consumer);
+
+    true：
+        一旦rabbitmq将消息发送给消费者就会从内存中删除，这种情况下会丢失正在处理的消息。
+
+消息持久化
+    boolean durable = faulse;
+    channel.queueDeclare(QUEUE_NAME,durable,false,false,null);
+
+    已声明的队列不可以改变持久化，rabbit不允许重新定义(参数列表一致)已存在的队列。
+
+
+
+
+
+
+
+
+
+

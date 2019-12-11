@@ -1,0 +1,10 @@
+spring:
+  rabbitmq:
+    host:
+    port: 5672
+    username: kris
+    password:
+    virtual-host: /vhost_kris
+
+server:
+  port: 8080

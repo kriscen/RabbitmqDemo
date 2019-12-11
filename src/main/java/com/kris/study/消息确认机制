@@ -1,0 +1,24 @@
+消息确认机制(事务+confirm)
+    AMQP事务机制
+        txSelect
+            把channel设置成transation模式
+        txCommit
+            提交事务
+        txRollback
+            回滚事务
+        缺点：
+            降低了rabbitmq的消息吞吐量
+
+    Confirm模式
+        实现原理
+            所有在该信道上发布的消息会被指派一个唯一ID(从1开始)，一旦消息被投递到所有匹配的队列之后，broker就会发送一个确认给生产者(包含消息的唯一ID)，使生产者知道消息已经正确到达目的队列，如果消息和队列是可持久化的，那么确认消息就会将消息写入磁盘后发出，broker回传给生产者的确认消息中deliver-tag域包含了确认消息的序列号。此外broker也可以设置basic.ack的multiple域，表示到这个序列号之前的消息都已经得到处理。
+            comfirm最大的好处在于异步处理。
+
+        模式
+            1.普通
+                发一条waitForComfirms
+            2.批量
+                waitForComfirms
+            3.异步
+                提供一个回调方法
+                channel提供的confirmListener回调方法只包含deliveryTag(当前chanel发出的消息序列)，我们需要为自己每一个channel维护一个unconfirm的消息序号集合，每publish一条数据，集合元素+1，每回调一次handleAck,unconfirm集合删掉相应的一条(muliplle=false)或者多条(multiple=true)记录。从程序运行效率上看，这个unconfirm集合最好采用有序集合SortedSed。
